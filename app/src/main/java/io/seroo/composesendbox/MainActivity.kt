@@ -10,6 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -35,7 +37,8 @@ private fun TestScreen(viewModel: MainViewModel) {
     TestScreenWithUIState(
         uiState = uiState,
         onClick = viewModel::onClick,
-        onClick2 = viewModel::onClick2
+        onClick2 = viewModel::onClick2,
+        onClick3 = viewModel::onClick3
     )
 }
 
@@ -43,10 +46,12 @@ private fun TestScreen(viewModel: MainViewModel) {
 private fun TestScreenWithUIState(
     uiState: ViewModelState,
     onClick: () -> Unit,
-    onClick2: () -> Unit
+    onClick2: () -> Unit,
+    onClick3: () -> Unit,
 ) {
+    Log.d("GYH", "TestScreenWithUIState")
     val topNumber = remember(uiState.topNumber) {
-        uiState.topNumber
+        uiState.topNumber.topNumber
     }
 
     val testLogger: TestLogger = remember {
@@ -68,17 +73,21 @@ private fun TestScreenWithUIState(
             text = uiState.bottomText,
             onClick = onClick2
         )
+
+        Test3(uiState.testable, onClick3)
     }
 }
 
 @Composable
-private fun Test1(number: Int, onClick: () -> Unit) {
-    Log.d("Test1", "onClick - ${onClick.hashCode()}")
+private inline fun Test1(number: Int, crossinline onClick: () -> Unit) {
+//    Log.d("Test1", "onClick - ${onClick.hashCode()}")
     Text(
         modifier = Modifier
             .background(getRandomColor())
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable {
+                onClick()
+            }
             .padding(top = 16.dp, bottom = 16.dp),
         text = number.toString(),
         color = Color.White
@@ -97,6 +106,34 @@ private fun Test2(text: String, onClick: () -> Unit) {
         text = text,
         color = Color.White
     )
+}
+
+@Stable
+@Composable
+fun Test3(
+//    wrappedList: WrappedList,
+    list: List<String>,
+    onClick: () -> Unit
+) {
+    Log.d("Test3", "onClick - ${onClick.hashCode()}")
+    LazyColumn(
+        Modifier
+            .background(getRandomColor())
+            .fillMaxWidth()
+            .clickable { onClick() }
+    ) {
+        items(
+            list,
+            key = null,
+            contentType = { "a" }
+        ) {
+            Text(
+                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                text = it,
+                color = Color.White
+            )
+        }
+    }
 }
 /*
     @Composable
